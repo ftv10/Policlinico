@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<head>
+	<meta charset="utf-8">
+	<title> Registro de Pacientes</title>
+</head>
+
+<body>
+
+	<div ng-app="myApp" ng-controller="customersCtrl"> 
+
+	<form>
+		<section class="form-register">
+			
+			<h1>Registro de Pacientes</h1>
+
+		<input class="cont" type="text" name="nombre" id="nombre" ng-model="nombre" placeholder="Nombre" required>
+		
+		<input  class="cont" type="text" name="apellidos" id="apellidos" ng-model="apellidos" placeholder="Apellidos" required >
+
+		<p>Selecciona genero</p>
+		<input  type="radio" name="sexo"  value="F" ng-model="sexo" checked > femenino
+		<input  type="radio" name="sexo" value="M" ng-model="sexo" > masculino
+		
+
+		<input class="cont" type="text" name="direccion" id="direccion" ng-model="direccion" placeholder="Direccion" required >
+		
+		<p>Fecha de Nacimiento</p>	
+		<input class="cont" type="date" name="fecha_nacimiento" id="fecha_nacimiento" ng-model="fecha_nacimiento"required>
+
+		<input class="cont" type="text" name="dni" id="dni" pattern="[0-9]{8}" ng-model="dni" placeholder="DNI" required>
+
+		<input class="cont" type="text" name="telefono" id="telefono"  ng-model="telefono" placeholder="Telefono" required>
+
+		<button class="botons" ng-click="Registrar()">Registrar</button>
+		<!--<input class="botons" type="submit" ng-click="Registrar()" value="Registrar">-->
+
+
+	<table class="pure-table pure-table-horizontal">
+		<thead>
+  		<tr>
+    		<th>Nombre</th>
+    		<th>Apellidos</th>
+ 			<th>Sexo</th>
+ 			<th>Direccion</th>
+ 			<th>Fecha Nacimiento</th>
+ 			<th>Dni</th>
+ 			<th>Telefono</th>
+  		</tr>
+  		</thead>
+
+  	</table>
+
+  	<table>
+
+  		<tr ng-repeat="x in names">
+    		<td>{{x.nombre}}</td>
+    		<td>{{x.apellidos }}</td>
+ 			<td>{{x.sexo}}</td>
+ 			<td>{{x.direccion}}</td>
+ 			<td>{{x.fecha_nacimiento}}</td>
+ 			<td>{{x.dni}}</td>
+ 			<td>{{x.telefono}}</td>
+ 			<td><button  ng-click="Eliminar(x.id_pacientes)">Eliminar</button> 
+ 				<button ng-click="Seleccionar(x.id_pacientes, x.nombre, x.apellidos, x.sexo, x.direccion, x.fecha_nacimiento, x.dni, x.telefono)">Seleccionar</button></td>
+
+  		</tr>
+	</table>	
+		
+	</section>
+</form>
+
+
+
+<!--Modificar-->
+
+<form>
+	
+			
+			<h1>Modificar Pacientes</h1>
+
+		<input  type="text" name="nombre" id="nombre" ng-model="nombrem" placeholder="Nombre" required>
+		
+		<input   type="text" name="apellidos" id="apellidos" ng-model="apellidosm" placeholder="Apellidos" required >
+
+		<section>
+  		<p> Elegir Genero </p>
+		
+		<input  type="radio"  ng-model="sexom" id="F" value="F" name="sexom"> femenino
+		<input  type="radio" ng-model="sexom" id="M" value="M" name="sexom" > masculino
+		</section>
+		
+
+		<input  type="text" name="direccion" id="direccion" ng-model="direccionm" placeholder="Direccion" required >
+		
+		<p>Fecha de Nacimiento</p>	
+		<input  type="date" name="fecha_nacimiento" id="fecha_nacimientom" ng-model="fecha_nacimientom"required>
+
+		<input  type="text" name="dni" id="dni" pattern="[0-9]{8}" ng-model="dnim" placeholder="DNI" required>
+
+		<input  type="text" name="telefono" id="telefono"  ng-model="telefonom" placeholder="Telefono" required>
+
+		
+		<!--<input class="botons" type="submit" ng-click="Registrar()" value="Registrar">-->
+		<td><button  ng-click="Modificar()">Modificar</button> 
+
+	
+
+</form>	
+
+</div>
+
+
+
+<script>
+
+
+var app = angular.module('myApp', []);
+app.controller('customersCtrl', function($scope, $http) {
+    $http.get("api/pacientes")
+    .then(function (response) {$scope.names = response.data;});
+
+$scope.Registrar = function(){
+	var fecha_nacimiento = document.querySelector('#fecha_nacimientom').value;
+
+  $http({
+   method: 'POST',
+   url: 'api/pacientes/nuevo', 
+   data: {nombre: $scope.nombre, apellidos: $scope.apellidos, sexo: $scope.sexo, direccion: $scope.direccion, 
+   fecha_nacimiento: fecha_nacimiento, dni: $scope.dni, telefono: $scope.telefono}
+   }).then(function (response) {alert(response.data);
+  }, function (error){
+  });$scope.Lista();
+ }
+
+$scope.Lista = function(){
+  $http({
+   method: 'GET',
+   url: 'api/pacientes', 
+   }).then(function (response) {$scope.names = response.data;
+  }, function (error){
+  });
+ }
+
+
+
+$scope.Modificar = function(id){
+
+	var fecha_nacimientom = document.querySelector('#fecha_nacimientom').value;
+  $http({
+   method: 'PUT',
+   url: 'api/pacientes/modificar/'+$scope.id_pacientesm, 
+   data: {nombre: $scope.nombrem, apellidos: $scope.apellidosm, sexo: $scope.sexom, direccion: $scope.direccionm, 
+   fecha_nacimiento: fecha_nacimientom, dni: $scope.dnim, telefono: $scope.telefonom}
+   }).then(function (response) {alert(response.data);
+  }, function (error){
+  });$scope.Lista();
+ }
+
+
+$scope.Seleccionar = function(id_pacientes, nombre, apellidos, sexo, direccion, fecha_nacimiento, dni, telefono ){
+	$scope.id_pacientesm = id_pacientes;
+	$scope.nombrem = nombre;
+	$scope.apellidosm = apellidos;
+	$scope.sexom = sexo;
+	$scope.direccionm = direccion;
+	document.querySelector('#fecha_nacimientom').value = fecha_nacimiento;
+	$scope.dnim = dni;
+	$scope.telefonom = telefono;
+
+	console.log(sexo);
+ }
+
+
+
+
+
+$scope.Eliminar = function(id){
+ 	$http({
+ 		method: 'DELETE',
+ 		url: 'api/pacientes/eliminar/'+id,
+ 	}).then(function (response) {alert(response.data);
+ 	}, function (error){		
+ 	});$scope.Lista();
+ 		// alert ('nada');
+ 
+ }
+
+
+});
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
