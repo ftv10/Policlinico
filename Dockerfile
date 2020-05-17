@@ -6,7 +6,7 @@ FROM php:7.0-apache
 
 #RUN npm install
 
-COPY . /public
+COPY . /var/www/html/
 
 #CMD ["node", "index.js"]
 EXPOSE 80
